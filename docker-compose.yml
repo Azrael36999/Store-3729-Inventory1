@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: store3729
+    ports:
+      - "5432:5432"
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/store3729
+      JWT_SECRET: "dev-secret-change-me"
+      INIT_USERNAME: "Store3629"
+      INIT_PASSWORD: "ChangeMeNow123!"
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+  frontend:
+    image: node:20
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    command: sh -c "npm i && npm run dev -- --host 0.0.0.0 --port 5173"
+    environment:
+      VITE_API_URL: "http://localhost:8000"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
